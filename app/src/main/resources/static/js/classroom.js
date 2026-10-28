@@ -17,6 +17,7 @@ const Classroom = {
       this.myStuck = false; this.renderMyBar();
       toast(`${e.by}님이 "막혔어요"를 확인했습니다.`);
     });
+    Realtime.on('share-request', (e) => this.onShareRequest(e));
     Realtime.on('mic', (e) => toast(e.allow ? '강사가 마이크 사용을 허용했습니다. 라이브 탭에서 마이크를 켜세요.' : '마이크 사용 권한이 회수되었습니다.'));
     Realtime.on('connected', (ok) => {
       document.getElementById('chat-input').disabled = !ok || !App.current;
@@ -79,6 +80,23 @@ const Classroom = {
     const stuck = document.getElementById('btn-stuck');
     stuck.textContent = this.myStuck ? '🆘 막혔어요 해제' : '🆘 막혔어요';
     stuck.classList.toggle('on', this.myStuck);
+  },
+
+  /** 강사·조교의 화면 공유 요청. 수락하면 화면 공유 모듈(ScreenShare)이 있으면 공유를 시작한다. */
+  async onShareRequest(e) {
+    if (this.shareRequestOpen) return; // 이미 요청 창이 떠 있으면 무시
+    if (window.ScreenShare && ScreenShare.active) return; // 이미 공유 중
+    this.shareRequestOpen = true;
+    const accepted = await modal({
+      title: '화면 공유 요청',
+      body: `<div><b>${esc(e.from)}</b>님이 화면 공유를 요청했습니다.</div>
+        <div class="dim">수락하면 공유할 화면을 고르는 창이 뜹니다. 내 화면은 강사·조교만 볼 수 있고, 언제든 중지할 수 있습니다.</div>`,
+      buttons: [{ label: '거절', value: false, className: 'secondary' }, { label: '수락', value: true }],
+    });
+    this.shareRequestOpen = false;
+    if (!accepted) return;
+    if (window.ScreenShare) await ScreenShare.start();
+    else toast('화면 공유 기능은 다음 단계에서 연결됩니다.');
   },
 
   toggleHand() {
