@@ -41,3 +41,4 @@
 - STOMP 테스트: `.tools/jdk/bin/java -XX:-UsePerfData -Djava.io.tmpdir=data/tmp data/tmp/probe/StompProbe.java` (Bash에서 실행. PowerShell은 -D 인자를 깨뜨림)
 - STOMP: preserveReceiveOrder/PublishOrder 켬. 상태 스냅샷은 synchronized 안에서 전송(순서 역전 방지). 순서 보존 모드에서는 구독 거부 시 ERROR 프레임 대신 서버 로그만 남음(구독은 막힘).
 - 사용자가 테스트 중 ta1을 조교 해제한 적 있음 → 최종 점검 전 data/db 초기화해서 시드 재생성할 것.
+- GitHub: origin = https://github.com/g2jkj0274/on-sil.git (master). 단계마다 커밋 후 push 한다 (사용자 요청, 2026-10-28).
