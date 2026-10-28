@@ -42,3 +42,8 @@
 - STOMP: preserveReceiveOrder/PublishOrder 켬. 상태 스냅샷은 synchronized 안에서 전송(순서 역전 방지). 순서 보존 모드에서는 구독 거부 시 ERROR 프레임 대신 서버 로그만 남음(구독은 막힘).
 - 사용자가 테스트 중 ta1을 조교 해제한 적 있음 → 최종 점검 전 data/db 초기화해서 시드 재생성할 것.
 - GitHub: origin = https://github.com/g2jkj0274/on-sil.git (master). 단계마다 커밋 후 push 한다 (사용자 요청, 2026-10-28).
+
+## 다음에 이어서 할 일 (2026-10-28 종료 시점)
+- 2단계까지 사용자 브라우저 확인 완료 (6번 공유 요청 알림 누락 → 수락/거절 모달 추가로 해결).
+- 다음: 3단계 LiveKit 연동. `NoopMicPermissionHandler`를 LiveKitService(토큰 발급 + RoomServiceClient.updateParticipant로 마이크 권한)로 교체.
+  공유 요청 수락 시 `window.ScreenShare.start()`를 호출하도록 classroom.js에 이미 연결해 둠 (4단계에서 ScreenShare 모듈 구현).
