@@ -48,6 +48,10 @@
   <aside id="rightbar">
     <h3>접속자 <span id="online-count"></span></h3>
     <ul id="online-list"></ul>
+    <div id="my-bar" class="hidden">
+      <button id="btn-hand" class="secondary" onclick="Classroom.toggleHand()">✋ 손들기</button>
+      <button id="btn-stuck" class="secondary" onclick="Classroom.toggleStuck()">🆘 막혔어요</button>
+    </div>
     <div id="chat">
       <h3>채팅</h3>
       <div id="chat-log"></div>
@@ -64,6 +68,8 @@
 <script src="/vendor/livekit-client.umd.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/app.js"></script>
+<script src="/js/realtime.js"></script>
+<script src="/js/classroom.js"></script>
 <script src="/js/members.js"></script>
 <script>App.init();</script>
 </body>

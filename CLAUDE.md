@@ -29,9 +29,15 @@
 ## 진행 상황
 - [x] 0단계 환경 (setup/start/stop 동작, 바인드 확인, 폴더 밖 흔적 없음 확인)
 - [x] 1단계 회원·클래스·시드 (API curl 검증 완료, 브라우저 UI 확인은 사용자 확인 대기)
-- [ ] 2단계 강의실 화면 + 채팅·접속자·손들기
+- [x] 2단계 강의실 화면 + 채팅·접속자·손들기 (STOMP 다중 사용자 테스트 data/tmp/probe/StompProbe.java 통과, UI는 사용자 확인 대기)
 - [ ] 3단계 LiveKit + 강사 방송
 - [ ] 4단계 학생 화면 모니터링
 - [ ] 5단계 녹화
 - [ ] 6단계 자료실
 - [ ] 7단계 문서·최종 점검
+
+## 메모
+- 브라우저 확장(claude-in-chrome)으로는 localhost 페이지가 오류 페이지로 떠서 직접 UI 확인 불가 → UI 확인은 사용자에게 요청.
+- STOMP 테스트: `.tools/jdk/bin/java -XX:-UsePerfData -Djava.io.tmpdir=data/tmp data/tmp/probe/StompProbe.java` (Bash에서 실행. PowerShell은 -D 인자를 깨뜨림)
+- STOMP: preserveReceiveOrder/PublishOrder 켬. 상태 스냅샷은 synchronized 안에서 전송(순서 역전 방지). 순서 보존 모드에서는 구독 거부 시 ERROR 프레임 대신 서버 로그만 남음(구독은 막힘).
+- 사용자가 테스트 중 ta1을 조교 해제한 적 있음 → 최종 점검 전 data/db 초기화해서 시드 재생성할 것.

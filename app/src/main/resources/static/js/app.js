@@ -29,6 +29,7 @@ const App = {
     };
     for (const b of document.querySelectorAll('#tabs button')) b.onclick = () => this.showTab(b.dataset.tab);
 
+    Realtime.start();
     await this.loadClasses();
     const saved = Number(sessionStorage.getItem('onsil.class'));
     const first = this.classes.find((c) => c.id === saved) || this.classes[0];

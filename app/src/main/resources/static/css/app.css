@@ -101,6 +101,8 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
 #online-list .icons { font-size: 13px; }
 #online-list .ops { display: flex; gap: 3px; }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex: none; }
+#my-bar { display: flex; gap: 6px; padding: 10px; border-bottom: 1px solid #1f2023; }
+#my-bar button { flex: 1; }
 #chat { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 #chat-log { flex: 1; overflow-y: auto; padding: 4px 14px; }
 .msg { margin: 6px 0; word-break: break-word; }
