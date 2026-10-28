@@ -1,1 +1,80 @@
-<!doctype html><html><head><meta charset="utf-8"><title>on-sil</title></head><body>on-sil</body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>on-sil 로그인</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h1>on-sil 온라인 교실</h1>
+    <div class="dim">강사는 방송하고, 학생 화면을 한눈에 봅니다.</div>
+    <div class="tabs">
+      <button type="button" id="tab-login">로그인</button>
+      <button type="button" id="tab-signup" class="secondary">회원가입</button>
+    </div>
+
+    <form id="login-form">
+      <input name="username" placeholder="아이디" autocomplete="username" required autofocus>
+      <input name="password" type="password" placeholder="비밀번호" autocomplete="current-password" required>
+      <div class="error" id="login-error"></div>
+      <button type="submit">로그인</button>
+    </form>
+
+    <form id="signup-form" class="hidden">
+      <input name="username" placeholder="아이디 (영문/숫자 3~20자)" required>
+      <input name="password" type="password" placeholder="비밀번호 (4자 이상)" required>
+      <input name="displayName" placeholder="이름 (화면에 표시)" required>
+      <div class="radio-row">
+        <label><input type="radio" name="accountType" value="STUDENT" checked> 학생</label>
+        <label><input type="radio" name="accountType" value="TEACHER"> 강사</label>
+      </div>
+      <div class="error" id="signup-error"></div>
+      <button type="submit">가입하기</button>
+    </form>
+
+    <div class="hint">테스트 계정: teacher1, ta1, student1~4 (비밀번호 1234)</div>
+  </div>
+</div>
+<script>
+  const $ = (s) => document.querySelector(s);
+  function showTab(login) {
+    $('#login-form').classList.toggle('hidden', !login);
+    $('#signup-form').classList.toggle('hidden', login);
+    $('#tab-login').classList.toggle('secondary', !login);
+    $('#tab-signup').classList.toggle('secondary', login);
+  }
+  $('#tab-login').onclick = () => showTab(true);
+  $('#tab-signup').onclick = () => showTab(false);
+
+  async function login(username, password) {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ username, password }),
+    });
+    if (!res.ok) throw new Error((await res.json()).message || '로그인 실패');
+    location.href = '/';
+  }
+
+  $('#login-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    try { await login(f.get('username'), f.get('password')); }
+    catch (err) { $('#login-error').textContent = err.message; }
+  };
+
+  $('#signup-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target));
+    const res = await fetch('/api/signup', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(f),
+    });
+    if (!res.ok) { $('#signup-error').textContent = (await res.json()).message || '가입 실패'; return; }
+    try { await login(f.username, f.password); }
+    catch (err) { $('#signup-error').textContent = err.message; }
+  };
+</script>
+</body>
+</html>

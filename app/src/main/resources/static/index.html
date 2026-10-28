@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>on-sil 강의실</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div id="app">
+  <!-- 왼쪽: 내 클래스 목록 -->
+  <aside id="sidebar">
+    <div class="brand">on-sil</div>
+    <ul id="class-list"></ul>
+    <div class="actions">
+      <button id="btn-create-class" class="hidden">+ 클래스 만들기</button>
+      <button id="btn-join-class" class="secondary">초대 코드로 가입</button>
+    </div>
+    <div class="me">
+      <div class="who"><div id="me-name"></div><div id="me-type"></div></div>
+      <button id="btn-logout" class="secondary small">로그아웃</button>
+    </div>
+  </aside>
+
+  <!-- 가운데: 방송 / 모니터링 / 다시보기 / 자료실 / 멤버 -->
+  <main id="main">
+    <div id="no-class" class="empty-state">
+      <div>왼쪽에서 클래스를 선택하세요.<br><span class="dim">클래스가 없다면 초대 코드로 가입하세요.</span></div>
+    </div>
+    <header id="class-header" class="hidden">
+      <h2 id="class-name"></h2>
+      <span id="class-role" class="badge"></span>
+      <nav id="tabs">
+        <button data-tab="live">라이브</button>
+        <button data-tab="monitor" data-staff>모니터링<span class="count" id="monitor-count"></span></button>
+        <button data-tab="recordings">다시보기</button>
+        <button data-tab="materials">자료실</button>
+        <button data-tab="members">멤버</button>
+      </nav>
+    </header>
+    <section id="view-live" class="view hidden"></section>
+    <section id="view-monitor" class="view hidden"></section>
+    <section id="view-recordings" class="view hidden"></section>
+    <section id="view-materials" class="view hidden"></section>
+    <section id="view-members" class="view hidden"></section>
+  </main>
+
+  <!-- 오른쪽: 접속자 + 채팅 -->
+  <aside id="rightbar">
+    <h3>접속자 <span id="online-count"></span></h3>
+    <ul id="online-list"></ul>
+    <div id="chat">
+      <h3>채팅</h3>
+      <div id="chat-log"></div>
+      <form id="chat-form">
+        <input id="chat-input" placeholder="메시지 입력" maxlength="500" autocomplete="off" disabled>
+        <button id="chat-send" disabled>전송</button>
+      </form>
+    </div>
+  </aside>
+</div>
+<div id="toasts"></div>
+
+<script src="/vendor/stomp.umd.min.js"></script>
+<script src="/vendor/livekit-client.umd.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/members.js"></script>
+<script>App.init();</script>
+</body>
+</html>
