@@ -1,0 +1,17 @@
+# LiveKit server config for local development (on-sil)
+port: 7880
+bind_addresses:
+  - 127.0.0.1
+rtc:
+  tcp_port: 0
+  udp_port: 7882
+  use_external_ip: false
+  node_ip: 127.0.0.1
+  enable_loopback_candidate: true
+  ips:
+    includes:
+      - 127.0.0.1/32
+keys:
+  devkey: secret
+logging:
+  level: info
