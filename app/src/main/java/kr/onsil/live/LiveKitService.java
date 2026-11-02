@@ -68,7 +68,7 @@ public class LiveKitService implements MicPermissionHandler {
         } else if (role == ClassRole.STUDENT) {
             grants.add(new CanSubscribe(false));
             grants.add(new CanPublish(true));
-            grants.add(new CanPublishSources(List.of("screen_share", "screen_share_audio")));
+            grants.add(new CanPublishSources(List.of("screen_share")));
         } else {
             // 강사·조교는 학생에게 보이지 않게 구독만
             grants.add(new CanSubscribe(true));

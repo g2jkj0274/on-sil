@@ -82,10 +82,10 @@ const Classroom = {
     stuck.classList.toggle('on', this.myStuck);
   },
 
-  /** 강사·조교의 화면 공유 요청. 수락하면 화면 공유 모듈(ScreenShare)이 있으면 공유를 시작한다. */
+  /** 강사·조교의 화면 공유 요청. 수락하면 화면 공유(ScreenShare)를 시작한다. */
   async onShareRequest(e) {
     if (this.shareRequestOpen) return; // 이미 요청 창이 떠 있으면 무시
-    if (window.ScreenShare && ScreenShare.active) return; // 이미 공유 중
+    if (ScreenShare.active || ScreenShare.starting) return; // 이미 공유 중
     this.shareRequestOpen = true;
     const accepted = await modal({
       title: '화면 공유 요청',
@@ -95,8 +95,7 @@ const Classroom = {
     });
     this.shareRequestOpen = false;
     if (!accepted) return;
-    if (window.ScreenShare) await ScreenShare.start();
-    else toast('화면 공유 기능은 다음 단계에서 연결됩니다.');
+    await ScreenShare.start();
   },
 
   toggleHand() {

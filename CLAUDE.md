@@ -26,6 +26,8 @@
 - 앱 포트 8800: 2026-11-02 Windows(WinNAT)가 8080~8279를 예약해 8080 바인드 실패 → 변경. 시스템 설정(winnat)은 건드리지 않음.
 - LiveKit identity = username (같은 계정으로 두 탭 접속 시 먼저 들어온 쪽이 끊김). 강사·조교는 monitor 방에서 hidden.
 - 마이크 허용 순간 학생이 live 방에 없으면 updateParticipant 404 → 무시(토큰에 반영). 그래도 어긋나면 클라이언트가 `POST /api/classes/{id}/livekit/mic-sync`.
+- JS 모듈은 top-level `const`라 `window.X`로 접근 불가 → 직접 참조. 학생 화면 공유는 클릭 직후 createLocalScreenTracks 먼저(사용자 활성화), 그다음 토큰·접속.
+- 모니터링 타일 = staffState(sharing ∪ stuck) 기준, 영상은 monitor 방 구독(adaptiveStream). 막혔어요 먼저(누른 순), 나머지 이름순.
 - CSRF 끔, 세션 쿠키 SameSite=Strict (로컬 MVP).
 - 기준 시각(폴더 밖 점검용): 2026-10-28T20:46:31+09:00. 시작 전 이미 있던 것: ~/.m2(.lemminx-maven만), %TEMP%(c:\temp)\hsperfdata_User\2704(19:40).
 
@@ -33,8 +35,8 @@
 - [x] 0단계 환경 (setup/start/stop 동작, 바인드 확인, 폴더 밖 흔적 없음 확인)
 - [x] 1단계 회원·클래스·시드 (API curl 검증 완료, 브라우저 UI 확인은 사용자 확인 대기)
 - [x] 2단계 강의실 화면 + 채팅·접속자·손들기 (STOMP 다중 사용자 테스트 data/tmp/probe/StompProbe.java 통과, UI는 사용자 확인 대기)
-- [x] 3단계 LiveKit + 강사 방송 (토큰·마이크 권한 data/tmp/probe/LiveKitProbe.java 통과, 실제 방송 UI는 사용자 확인 대기)
-- [ ] 4단계 학생 화면 모니터링
+- [x] 3단계 LiveKit + 강사 방송 (토큰·마이크 권한 data/tmp/probe/LiveKitProbe.java 통과, 사용자 브라우저 확인 완료)
+- [x] 4단계 학생 화면 모니터링 (monitor 방 권한 LiveKitProbe 통과, UI는 사용자 확인 대기)
 - [ ] 5단계 녹화
 - [ ] 6단계 자료실
 - [ ] 7단계 문서·최종 점검
@@ -47,5 +49,5 @@
 - GitHub: origin = https://github.com/g2jkj0274/on-sil.git (master). 단계마다 커밋 후 push 한다 (사용자 요청, 2026-10-28).
 
 ## 다음에 이어서 할 일 (2026-11-02)
-- 3단계 브라우저 확인 요청함: 강사 방송 시작(화면+마이크) → 학생 화면/소리, 손들기→마이크 허용→학생 마이크 켜기→회수.
-- 다음: 4단계 학생 화면 모니터링. classroom.js가 공유 요청 수락 시 `window.ScreenShare.start()` 호출 → ScreenShare 모듈(monitor 방 토큰 `/api/classes/{id}/livekit/monitor`) 구현, 모니터링 탭 그리드.
+- 4단계 브라우저 확인 요청함: 공유 요청→학생 수락→모니터링 탭 타일, 학생 직접 공유/중지, 막혔어요 정렬·확인, 크게 보기.
+- 다음: 5단계 녹화.
