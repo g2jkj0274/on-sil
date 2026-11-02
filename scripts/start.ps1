@@ -33,7 +33,7 @@ else {
 # Spring Boot (작업 폴더를 on-sil 로 두고 data\ 상대 경로를 씁니다)
 if (Get-RunningPid 'app') { Write-Step 'Spring Boot 이미 실행 중' }
 else {
-    Write-Step 'Spring Boot 서버 시작 (127.0.0.1:8080)'
+    Write-Step 'Spring Boot 서버 시작 (127.0.0.1:8800)'
     $p = Start-Process -FilePath $JavaExe -WorkingDirectory $Root -WindowStyle Hidden -PassThru `
         -ArgumentList @('-XX:-UsePerfData', '-Djava.io.tmpdir=data\tmp', '-Dfile.encoding=UTF-8',
                         '-jar', 'app\target\on-sil.jar') `
@@ -47,7 +47,7 @@ $ok = $false
 for ($i = 0; $i -lt 90; $i++) {
     if (-not (Get-RunningPid 'app')) { break }
     try {
-        $r = Invoke-WebRequest -UseBasicParsing -TimeoutSec 2 -Uri 'http://127.0.0.1:8080/login.html'
+        $r = Invoke-WebRequest -UseBasicParsing -TimeoutSec 2 -Uri 'http://127.0.0.1:8800/login.html'
         if ($r.StatusCode -eq 200) { $ok = $true; break }
     } catch [System.Net.WebException] {
         # 401 등 HTTP 응답이 왔다면 서버는 떠 있는 것
@@ -56,7 +56,7 @@ for ($i = 0; $i -lt 90; $i++) {
     Start-Sleep -Seconds 1
 }
 if ($ok) {
-    Write-Step '준비 완료: http://localhost:8080  (종료: stop.cmd, 로그: data\logs)'
+    Write-Step '준비 완료: http://localhost:8800  (종료: stop.cmd, 로그: data\logs)'
 } else {
     Write-Host '[on-sil] Spring Boot 서버가 시작되지 않았습니다. data\logs\app.log 를 확인하세요.' -ForegroundColor Red
     exit 1

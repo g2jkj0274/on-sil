@@ -5,7 +5,7 @@
 ## 절대 규칙
 - on-sil 폴더 밖에 아무것도 남기지 않는다 (전역 설치·환경변수·레지스트리 금지, Docker/Node 금지).
 - 도구는 `.tools/`, Maven 저장소/래퍼는 `.m2/`, 런타임 데이터는 `data/`.
-- 모든 서버는 127.0.0.1에만 바인드. 경로에 공백/한글이 있어도 동작해야 함.
+- 모든 서버는 127.0.0.1에만 바인드 (앱 8800, LiveKit 7880/UDP 7882). 경로에 공백/한글이 있어도 동작해야 함.
 - 규칙을 지킬 수 없으면 진행 전에 사용자에게 묻는다.
 
 ## 실행
@@ -23,6 +23,9 @@
 - 학생 화면 격리: 클래스마다 LiveKit 방 2개.
   - `class-{id}-live`: 강사 송출(화면+마이크), 모두 구독. 학생 마이크는 강사 허용 시 서버가 updateParticipant로 권한 부여.
   - `class-{id}-monitor`: 학생은 화면공유 송출만(canSubscribe=false), 강사·조교는 구독만.
+- 앱 포트 8800: 2026-11-02 Windows(WinNAT)가 8080~8279를 예약해 8080 바인드 실패 → 변경. 시스템 설정(winnat)은 건드리지 않음.
+- LiveKit identity = username (같은 계정으로 두 탭 접속 시 먼저 들어온 쪽이 끊김). 강사·조교는 monitor 방에서 hidden.
+- 마이크 허용 순간 학생이 live 방에 없으면 updateParticipant 404 → 무시(토큰에 반영). 그래도 어긋나면 클라이언트가 `POST /api/classes/{id}/livekit/mic-sync`.
 - CSRF 끔, 세션 쿠키 SameSite=Strict (로컬 MVP).
 - 기준 시각(폴더 밖 점검용): 2026-10-28T20:46:31+09:00. 시작 전 이미 있던 것: ~/.m2(.lemminx-maven만), %TEMP%(c:\temp)\hsperfdata_User\2704(19:40).
 
@@ -30,7 +33,7 @@
 - [x] 0단계 환경 (setup/start/stop 동작, 바인드 확인, 폴더 밖 흔적 없음 확인)
 - [x] 1단계 회원·클래스·시드 (API curl 검증 완료, 브라우저 UI 확인은 사용자 확인 대기)
 - [x] 2단계 강의실 화면 + 채팅·접속자·손들기 (STOMP 다중 사용자 테스트 data/tmp/probe/StompProbe.java 통과, UI는 사용자 확인 대기)
-- [ ] 3단계 LiveKit + 강사 방송
+- [x] 3단계 LiveKit + 강사 방송 (토큰·마이크 권한 data/tmp/probe/LiveKitProbe.java 통과, 실제 방송 UI는 사용자 확인 대기)
 - [ ] 4단계 학생 화면 모니터링
 - [ ] 5단계 녹화
 - [ ] 6단계 자료실
@@ -43,7 +46,6 @@
 - 사용자가 테스트 중 ta1을 조교 해제한 적 있음 → 최종 점검 전 data/db 초기화해서 시드 재생성할 것.
 - GitHub: origin = https://github.com/g2jkj0274/on-sil.git (master). 단계마다 커밋 후 push 한다 (사용자 요청, 2026-10-28).
 
-## 다음에 이어서 할 일 (2026-10-28 종료 시점)
-- 2단계까지 사용자 브라우저 확인 완료 (6번 공유 요청 알림 누락 → 수락/거절 모달 추가로 해결).
-- 다음: 3단계 LiveKit 연동. `NoopMicPermissionHandler`를 LiveKitService(토큰 발급 + RoomServiceClient.updateParticipant로 마이크 권한)로 교체.
-  공유 요청 수락 시 `window.ScreenShare.start()`를 호출하도록 classroom.js에 이미 연결해 둠 (4단계에서 ScreenShare 모듈 구현).
+## 다음에 이어서 할 일 (2026-11-02)
+- 3단계 브라우저 확인 요청함: 강사 방송 시작(화면+마이크) → 학생 화면/소리, 손들기→마이크 허용→학생 마이크 켜기→회수.
+- 다음: 4단계 학생 화면 모니터링. classroom.js가 공유 요청 수락 시 `window.ScreenShare.start()` 호출 → ScreenShare 모듈(monitor 방 토큰 `/api/classes/{id}/livekit/monitor`) 구현, 모니터링 탭 그리드.
