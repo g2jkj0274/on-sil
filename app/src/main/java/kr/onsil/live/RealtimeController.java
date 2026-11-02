@@ -155,14 +155,6 @@ public class RealtimeController {
         state.setBroadcasting(classId, payload.on());
     }
 
-    /** 강사: 녹화 시작/종료 알림 */
-    @MessageMapping("/class/{classId}/recording")
-    public void recording(@DestinationVariable Long classId, @Payload OnPayload payload, Principal principal) {
-        AppUser me = me(principal);
-        classService.requireRole(classId, me.getId(), ClassRole.TEACHER);
-        state.setRecording(classId, payload.on());
-    }
-
     private void sendEvent(String username, Object event) {
         messaging.convertAndSendToUser(username, "/queue/events", event);
     }

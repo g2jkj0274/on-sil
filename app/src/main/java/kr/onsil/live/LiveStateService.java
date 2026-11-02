@@ -150,6 +150,11 @@ public class LiveStateService {
         publish(classId);
     }
 
+    public boolean isRecording(Long classId) {
+        ClassLive c = live(classId);
+        synchronized (c) { return c.recording; }
+    }
+
     public void setRecording(Long classId, boolean on) {
         ClassLive c = live(classId);
         synchronized (c) { c.recording = on; }

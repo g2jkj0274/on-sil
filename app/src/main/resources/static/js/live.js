@@ -12,6 +12,11 @@ const Live = {
 
   init() {
     Realtime.on('state', (s) => this.onState(s));
+    // 실시간 연결이 끊겼다 붙으면 서버의 방송 상태가 초기화되므로, 아직 송출 중이면 다시 알린다
+    Realtime.on('connected', (ok) => {
+      const lp = ok && App.isTeacher && this.room && this.room.localParticipant;
+      if (lp && (lp.isScreenShareEnabled || lp.isMicrophoneEnabled)) Realtime.send('broadcast', { on: true });
+    });
     Realtime.on('mic', (e) => { if (!e.allow) this.setMic(false); });
   },
 
@@ -25,6 +30,7 @@ const Live = {
 
   async onLeave() {
     this.gen++;
+    await Recorder.stop();
     if (this.broadcasting && App.isTeacher) Realtime.send('broadcast', { on: false });
     this.broadcasting = false;
     this.stateClassId = null;
@@ -149,6 +155,7 @@ const Live = {
   },
 
   async stopBroadcast() {
+    await Recorder.stop();
     if (this.room) {
       const lp = this.room.localParticipant;
       try { await lp.setScreenShareEnabled(false); } catch (e) { console.error(e); }
@@ -202,6 +209,7 @@ const Live = {
         </div>
         <div id="live-bar">
           <span id="live-state" class="badge"></span>
+          <span id="live-rec" class="badge live hidden"></span>
           <span id="live-voices" class="dim"></span>
           <span class="spacer"></span>
           <span id="live-controls" class="row"></span>
@@ -230,6 +238,7 @@ const Live = {
     this.renderStage();
     this.renderControls();
     this.renderVoices();
+    Recorder.sync();
   },
 
   /** 무대에 띄울 화면 공유 트랙 (강사 본인은 내 화면 미리보기). */
@@ -276,6 +285,11 @@ const Live = {
     const state = document.getElementById('live-state');
     state.textContent = this.broadcasting ? 'LIVE' : '방송 전';
     state.classList.toggle('live', this.broadcasting);
+    // 녹화 표시: 강사는 경과 시간, 다른 사람은 서버 상태 기준
+    const rec = document.getElementById('live-rec');
+    const recording = App.isTeacher ? Recorder.active : !!(Classroom.state && Classroom.state.recording);
+    rec.classList.toggle('hidden', !recording);
+    rec.textContent = App.isTeacher && Recorder.active ? `● REC ${Recorder.elapsed()}` : '● 녹화 중';
 
     const box = document.getElementById('live-controls');
     box.innerHTML = '';
@@ -294,6 +308,9 @@ const Live = {
       if (this.broadcasting) {
         add(this.micOn ? '🎤 마이크 끄기' : '🎤 마이크 켜기', () => this.setMic(!this.micOn), 'secondary');
         add('🖥️ 화면 다시 선택', () => this.reselectScreen(), 'secondary');
+        if (Recorder.active) add('⏹ 녹화 종료', () => Recorder.stop(), 'secondary');
+        else add('⏺ 녹화 시작', () => Recorder.start(), 'secondary');
+        if (Recorder.busy) box.lastChild.disabled = true;
         add('■ 방송 종료', () => this.stopBroadcast(), 'danger');
       } else {
         add('● 방송 시작', () => this.startBroadcast());

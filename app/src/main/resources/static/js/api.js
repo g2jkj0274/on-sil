@@ -95,6 +95,14 @@ function formatBytes(n) {
   return `${(n / 1024 / 1024 / 1024).toFixed(2)} GB`;
 }
 
+/** 1:05, 1:02:03 형태. */
+function formatDuration(ms) {
+  const s = Math.max(0, Math.round(ms / 1000));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  const pad = (n) => String(n).padStart(2, '0');
+  return h ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`;
+}
+
 function formatTime(iso) {
   const d = new Date(iso);
   return d.toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });

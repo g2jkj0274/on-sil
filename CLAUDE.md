@@ -29,6 +29,12 @@
 - JS 모듈은 top-level `const`라 `window.X`로 접근 불가 → 직접 참조. 학생 화면 공유는 클릭 직후 createLocalScreenTracks 먼저(사용자 활성화), 그다음 토큰·접속.
 - 모니터링 타일 = staffState(sharing ∪ stuck) 기준, 영상은 monitor 방 구독(adaptiveStream). 막혔어요 먼저(누른 순), 나머지 이름순.
 - 한 브라우저 = 한 계정(쿠키 공유). 탭이 아는 사용자를 `X-Onsil-User` 헤더로 보내고 SessionUserCheckFilter가 다르면 409 → 새로 고침 안내. STOMP 재연결 시 CONNECTED user-name도 비교.
+- 녹화: LiveKit Egress는 Docker/Linux 필요 → 불가. 강사 브라우저 MediaRecorder(webm vp8/opus, 5초 조각) → `POST /recordings/{id}/chunks?seq=n` → data/recordings/{classId}/{id}.webm.
+  - 영상은 MediaStreamTrackGenerator 중계(화면 다시 선택해도 녹화 유지, Chrome/Edge). 없으면 화면 바뀔 때 녹화 종료.
+  - 소리는 AudioContext로 강사 마이크+화면 소리+학생 마이크 믹스 (Live.renderAll → Recorder.sync).
+  - WebM에 Duration이 없어 탐색 불가 문제 → 첫 조각 저장 시 Info에 Duration(0.0) 삽입, finish 때 덮어씀 (WebmDuration).
+  - 끝 신호 없는 녹화: 서버 시작 시 / 목록 조회 시 60초 이상 조각 없으면 받은 데까지로 READY.
+  - 녹화 상태는 REST(start/finish)로 바뀜(STOMP /recording 제거). STOMP 재연결 시 강사는 broadcast 재전송, 녹화는 조각 도착 시 복구.
 - CSRF 끔, 세션 쿠키 SameSite=Strict (로컬 MVP).
 - 기준 시각(폴더 밖 점검용): 2026-10-28T20:46:31+09:00. 시작 전 이미 있던 것: ~/.m2(.lemminx-maven만), %TEMP%(c:\temp)\hsperfdata_User\2704(19:40).
 
@@ -37,8 +43,8 @@
 - [x] 1단계 회원·클래스·시드 (API curl 검증 완료, 브라우저 UI 확인은 사용자 확인 대기)
 - [x] 2단계 강의실 화면 + 채팅·접속자·손들기 (STOMP 다중 사용자 테스트 data/tmp/probe/StompProbe.java 통과, UI는 사용자 확인 대기)
 - [x] 3단계 LiveKit + 강사 방송 (토큰·마이크 권한 data/tmp/probe/LiveKitProbe.java 통과, 사용자 브라우저 확인 완료)
-- [x] 4단계 학생 화면 모니터링 (monitor 방 권한 LiveKitProbe 통과, UI는 사용자 확인 대기)
-- [ ] 5단계 녹화
+- [x] 4단계 학생 화면 모니터링 (monitor 방 권한 LiveKitProbe 통과, 사용자 브라우저 확인 완료)
+- [x] 5단계 녹화 (data/tmp/probe/RecordingProbe.java 27개 통과, 실제 녹화 UI는 사용자 확인 대기)
 - [ ] 6단계 자료실
 - [ ] 7단계 문서·최종 점검
 
@@ -50,5 +56,5 @@
 - GitHub: origin = https://github.com/g2jkj0274/on-sil.git (master). 단계마다 커밋 후 push 한다 (사용자 요청, 2026-10-28).
 
 ## 다음에 이어서 할 일 (2026-11-02)
-- 4단계 1차 확인: 한 브라우저에서 student1·2 로그인 → 쿠키 공유로 둘 다 student2 토큰을 받아 DUPLICATE_IDENTITY (위 필터로 막음). 다른 브라우저/프로필로 재확인 요청함: 공유 요청→학생 수락→모니터링 탭 타일, 학생 직접 공유/중지, 막혔어요 정렬·확인, 크게 보기.
-- 다음: 5단계 녹화.
+- 5단계 브라우저 확인 요청함: 방송 중 녹화 시작/종료, 녹화 중 화면 다시 선택, 학생 마이크 포함 여부, 다시보기 재생·탐색·다운로드·이름 바꾸기·삭제.
+- 다음: 6단계 자료실.
