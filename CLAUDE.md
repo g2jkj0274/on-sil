@@ -59,4 +59,5 @@
 - GitHub: origin = https://github.com/g2jkj0274/on-sil.git (master). 단계마다 커밋 후 push 한다 (사용자 요청, 2026-10-28).
 
 ## 다음에 이어서 할 일 (2026-11-02)
-- 7단계까지 완료. 사용자 최종 확인 대기. data/samples 의 510MB 파일 삭제 여부 사용자에게 물어봄.
+- 7단계까지 완료.
+- 사용자 요청으로 설치물 전부 삭제함: .tools, .m2, app/target, data (DB·로그·샘플 포함). 다시 쓰려면 setup.cmd → start.cmd (기본 계정 재생성).
