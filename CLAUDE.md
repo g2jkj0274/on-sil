@@ -52,6 +52,7 @@
 
 ## 메모
 - 브라우저 확장(claude-in-chrome)으로는 localhost 페이지가 오류 페이지로 떠서 직접 UI 확인 불가 → UI 확인은 사용자에게 요청.
+- 자료실 샘플: data/samples (생성기 data/tmp/probe/MakeSamples.java, -Djava.awt.headless=true). 510MB 파일 포함 → 최종 정리 때 삭제 여부 확인.
 - STOMP 테스트: `.tools/jdk/bin/java -XX:-UsePerfData -Djava.io.tmpdir=data/tmp data/tmp/probe/StompProbe.java` (Bash에서 실행. PowerShell은 -D 인자를 깨뜨림)
 - STOMP: preserveReceiveOrder/PublishOrder 켬. 상태 스냅샷은 synchronized 안에서 전송(순서 역전 방지). 순서 보존 모드에서는 구독 거부 시 ERROR 프레임 대신 서버 로그만 남음(구독은 막힘).
 - 사용자가 테스트 중 ta1을 조교 해제한 적 있음 → 최종 점검 전 data/db 초기화해서 시드 재생성할 것.
