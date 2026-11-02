@@ -33,6 +33,9 @@ else {
 # Spring Boot (작업 폴더를 on-sil 로 두고 data\ 상대 경로를 씁니다)
 if (Get-RunningPid 'app') { Write-Step 'Spring Boot 이미 실행 중' }
 else {
+    # 지난 실행이 data	mp 에 남긴 Tomcat 임시 폴더 정리
+    Get-ChildItem -LiteralPath $TmpDir -Directory -Filter 'tomcat*' -ErrorAction SilentlyContinue |
+        Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
     Write-Step 'Spring Boot 서버 시작 (127.0.0.1:8800)'
     $p = Start-Process -FilePath $JavaExe -WorkingDirectory $Root -WindowStyle Hidden -PassThru `
         -ArgumentList @('-XX:-UsePerfData', '-Djava.io.tmpdir=data\tmp', '-Dfile.encoding=UTF-8',

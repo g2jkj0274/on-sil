@@ -36,28 +36,27 @@
   - 끝 신호 없는 녹화: 서버 시작 시 / 목록 조회 시 60초 이상 조각 없으면 받은 데까지로 READY.
   - 녹화 상태는 REST(start/finish)로 바뀜(STOMP /recording 제거). STOMP 재연결 시 강사는 broadcast 재전송, 녹화는 조각 도착 시 복구.
 - 자료실: 강사·조교만 업로드/삭제, 멤버 전원 다운로드. 디스크 data/materials/{classId}/{id}(원래 이름은 DB만). 열기(inline)는 PDF·이미지·영상·음성·텍스트 화이트리스트만, 나머지(HTML/SVG 등)는 항상 attachment+nosniff (같은 출처 XSS 방지). 변경 시 public 토픽 {"type":"materials"}.
-- C:	emp 의 GUID.tmp(0바이트) 파일들은 on-sil 이전부터 외부 도구가 만들던 것 (앱 아님) — 최종 점검 때 혼동 주의.
+- 폴더 밖 점검 시 혼동 주의(모두 on-sil과 무관, 2026-11-02 확인): C:	emp 의 GUID.tmp(0바이트)·dd_BackgroundDownload·TCD*.tmp 등, C:	emp\hsperfdata_User\{JetBrains PID}, 시스템 JAVA_HOME(C:\Program Files\Java), HKCU\Software\JavaSoft(JetBrains Prefs).
+- start.ps1이 앱 시작 전 data	mp	omcat* 임시 폴더를 정리.
 - CSRF 끔, 세션 쿠키 SameSite=Strict (로컬 MVP).
 - 기준 시각(폴더 밖 점검용): 2026-10-28T20:46:31+09:00. 시작 전 이미 있던 것: ~/.m2(.lemminx-maven만), %TEMP%(c:\temp)\hsperfdata_User\2704(19:40).
 
 ## 진행 상황
 - [x] 0단계 환경 (setup/start/stop 동작, 바인드 확인, 폴더 밖 흔적 없음 확인)
 - [x] 1단계 회원·클래스·시드 (API curl 검증 완료, 브라우저 UI 확인은 사용자 확인 대기)
-- [x] 2단계 강의실 화면 + 채팅·접속자·손들기 (STOMP 다중 사용자 테스트 data/tmp/probe/StompProbe.java 통과, UI는 사용자 확인 대기)
-- [x] 3단계 LiveKit + 강사 방송 (토큰·마이크 권한 data/tmp/probe/LiveKitProbe.java 통과, 사용자 브라우저 확인 완료)
+- [x] 2단계 강의실 화면 + 채팅·접속자·손들기 (STOMP 다중 사용자 테스트 scripts/probe/StompProbe.java 통과, UI는 사용자 확인 대기)
+- [x] 3단계 LiveKit + 강사 방송 (토큰·마이크 권한 scripts/probe/LiveKitProbe.java 통과, 사용자 브라우저 확인 완료)
 - [x] 4단계 학생 화면 모니터링 (monitor 방 권한 LiveKitProbe 통과, 사용자 브라우저 확인 완료)
-- [x] 5단계 녹화 (data/tmp/probe/RecordingProbe.java 27개 통과, 사용자 브라우저 확인 완료)
-- [x] 6단계 자료실 (data/tmp/probe/MaterialProbe.java 21개 통과, UI는 사용자 확인 대기)
-- [ ] 7단계 문서·최종 점검
+- [x] 5단계 녹화 (scripts/probe/RecordingProbe.java 27개 통과, 사용자 브라우저 확인 완료)
+- [x] 6단계 자료실 (scripts/probe/MaterialProbe.java 21개 통과, 사용자 브라우저 확인 완료)
+- [x] 7단계 문서·최종 점검 (README.md, docs/architecture.md, 한글·공백 경로 복사본에서 setup→start→테스트 75/75, 바인드 127.0.0.1만, 폴더 밖 흔적 없음, data 초기화·시드 재생성)
 
 ## 메모
 - 브라우저 확장(claude-in-chrome)으로는 localhost 페이지가 오류 페이지로 떠서 직접 UI 확인 불가 → UI 확인은 사용자에게 요청.
-- 자료실 샘플: data/samples (생성기 data/tmp/probe/MakeSamples.java, -Djava.awt.headless=true). 510MB 파일 포함 → 최종 정리 때 삭제 여부 확인.
-- STOMP 테스트: `.tools/jdk/bin/java -XX:-UsePerfData -Djava.io.tmpdir=data/tmp data/tmp/probe/StompProbe.java` (Bash에서 실행. PowerShell은 -D 인자를 깨뜨림)
+- 자료실 샘플: data/samples (생성기 scripts/probe/MakeSamples.java, -Djava.awt.headless=true). 510MB 파일 포함 → 최종 정리 때 삭제 여부 확인.
+- 자동 테스트: `.tools/jdk/bin/java -XX:-UsePerfData -Djava.io.tmpdir=data/tmp scripts/probe/{Stomp,LiveKit,Recording,Material}Probe.java` (on-sil 루트에서, Bash로 실행. PowerShell은 -D 인자를 깨뜨림). 채팅을 남기므로 끝나면 필요 시 data 초기화.
 - STOMP: preserveReceiveOrder/PublishOrder 켬. 상태 스냅샷은 synchronized 안에서 전송(순서 역전 방지). 순서 보존 모드에서는 구독 거부 시 ERROR 프레임 대신 서버 로그만 남음(구독은 막힘).
-- 사용자가 테스트 중 ta1을 조교 해제한 적 있음 → 최종 점검 전 data/db 초기화해서 시드 재생성할 것.
 - GitHub: origin = https://github.com/g2jkj0274/on-sil.git (master). 단계마다 커밋 후 push 한다 (사용자 요청, 2026-10-28).
 
 ## 다음에 이어서 할 일 (2026-11-02)
-- 6단계 브라우저 확인 요청함: 업로드(버튼/끌어다 놓기, 진행률), 다른 사람 목록 자동 갱신, 열기/다운로드, 삭제, 학생 권한.
-- 다음: 7단계 문서·최종 점검 (README, data/db 초기화 후 시드 재생성, 폴더 밖 흔적 점검, 바인드 점검).
+- 7단계까지 완료. 사용자 최종 확인 대기. data/samples 의 510MB 파일 삭제 여부 사용자에게 물어봄.
