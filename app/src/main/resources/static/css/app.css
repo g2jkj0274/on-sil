@@ -175,3 +175,17 @@ a.button.secondary:hover { background: #4e5058; }
 #rec-player h4 { margin: 0; }
 #rec-player video { width: 100%; max-height: 65vh; background: #000; border-radius: var(--radius); margin-top: 10px; }
 table.list tr.active td { background: var(--bg-3); }
+
+/* ---------- 자료실 ---------- */
+#view-materials.dragging { outline: 2px dashed var(--accent); outline-offset: -8px; background: #5865f210; }
+#mat-filter { width: 220px; }
+#mat-list { margin-top: 10px; }
+.mat-name { word-break: break-all; }
+#mat-uploads { display: grid; gap: 6px; margin-top: 10px; }
+#mat-uploads:empty { display: none; }
+.mat-upload { display: grid; grid-template-columns: minmax(0, 1fr) 160px 140px auto; gap: 10px; align-items: center; }
+.mat-upload .bar { height: 6px; background: var(--bg-0); border-radius: 3px; overflow: hidden; }
+.mat-upload .bar div { height: 100%; background: var(--accent); transition: width .2s; }
+.mat-status { font-size: 12px; }
+.error-text { color: #fa777c; }
+.ok-text { color: var(--green); }

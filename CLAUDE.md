@@ -35,6 +35,8 @@
   - WebM에 Duration이 없어 탐색 불가 문제 → 첫 조각 저장 시 Info에 Duration(0.0) 삽입, finish 때 덮어씀 (WebmDuration).
   - 끝 신호 없는 녹화: 서버 시작 시 / 목록 조회 시 60초 이상 조각 없으면 받은 데까지로 READY.
   - 녹화 상태는 REST(start/finish)로 바뀜(STOMP /recording 제거). STOMP 재연결 시 강사는 broadcast 재전송, 녹화는 조각 도착 시 복구.
+- 자료실: 강사·조교만 업로드/삭제, 멤버 전원 다운로드. 디스크 data/materials/{classId}/{id}(원래 이름은 DB만). 열기(inline)는 PDF·이미지·영상·음성·텍스트 화이트리스트만, 나머지(HTML/SVG 등)는 항상 attachment+nosniff (같은 출처 XSS 방지). 변경 시 public 토픽 {"type":"materials"}.
+- C:	emp 의 GUID.tmp(0바이트) 파일들은 on-sil 이전부터 외부 도구가 만들던 것 (앱 아님) — 최종 점검 때 혼동 주의.
 - CSRF 끔, 세션 쿠키 SameSite=Strict (로컬 MVP).
 - 기준 시각(폴더 밖 점검용): 2026-10-28T20:46:31+09:00. 시작 전 이미 있던 것: ~/.m2(.lemminx-maven만), %TEMP%(c:\temp)\hsperfdata_User\2704(19:40).
 
@@ -44,8 +46,8 @@
 - [x] 2단계 강의실 화면 + 채팅·접속자·손들기 (STOMP 다중 사용자 테스트 data/tmp/probe/StompProbe.java 통과, UI는 사용자 확인 대기)
 - [x] 3단계 LiveKit + 강사 방송 (토큰·마이크 권한 data/tmp/probe/LiveKitProbe.java 통과, 사용자 브라우저 확인 완료)
 - [x] 4단계 학생 화면 모니터링 (monitor 방 권한 LiveKitProbe 통과, 사용자 브라우저 확인 완료)
-- [x] 5단계 녹화 (data/tmp/probe/RecordingProbe.java 27개 통과, 실제 녹화 UI는 사용자 확인 대기)
-- [ ] 6단계 자료실
+- [x] 5단계 녹화 (data/tmp/probe/RecordingProbe.java 27개 통과, 사용자 브라우저 확인 완료)
+- [x] 6단계 자료실 (data/tmp/probe/MaterialProbe.java 21개 통과, UI는 사용자 확인 대기)
 - [ ] 7단계 문서·최종 점검
 
 ## 메모
@@ -56,5 +58,5 @@
 - GitHub: origin = https://github.com/g2jkj0274/on-sil.git (master). 단계마다 커밋 후 push 한다 (사용자 요청, 2026-10-28).
 
 ## 다음에 이어서 할 일 (2026-11-02)
-- 5단계 브라우저 확인 요청함: 방송 중 녹화 시작/종료, 녹화 중 화면 다시 선택, 학생 마이크 포함 여부, 다시보기 재생·탐색·다운로드·이름 바꾸기·삭제.
-- 다음: 6단계 자료실.
+- 6단계 브라우저 확인 요청함: 업로드(버튼/끌어다 놓기, 진행률), 다른 사람 목록 자동 갱신, 열기/다운로드, 삭제, 학생 권한.
+- 다음: 7단계 문서·최종 점검 (README, data/db 초기화 후 시드 재생성, 폴더 밖 흔적 점검, 바인드 점검).
