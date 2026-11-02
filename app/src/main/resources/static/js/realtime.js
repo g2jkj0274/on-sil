@@ -18,7 +18,13 @@ const Realtime = {
       heartbeatIncoming: 10000,
       heartbeatOutgoing: 10000,
     });
-    this.client.onConnect = () => {
+    this.client.onConnect = (frame) => {
+      // 다시 연결할 때는 현재 쿠키로 인증되므로, 다른 탭에서 계정이 바뀌었으면 여기서 드러난다
+      if (App.me && frame.headers['user-name'] && frame.headers['user-name'] !== App.me.username) {
+        this.client.deactivate();
+        sessionUserChanged();
+        return;
+      }
       this.client.subscribe('/user/queue/events', (msg) => {
         const data = JSON.parse(msg.body);
         if (data.classId && App.current && data.classId !== App.current.id) return;

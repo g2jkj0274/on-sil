@@ -28,6 +28,7 @@
 - 마이크 허용 순간 학생이 live 방에 없으면 updateParticipant 404 → 무시(토큰에 반영). 그래도 어긋나면 클라이언트가 `POST /api/classes/{id}/livekit/mic-sync`.
 - JS 모듈은 top-level `const`라 `window.X`로 접근 불가 → 직접 참조. 학생 화면 공유는 클릭 직후 createLocalScreenTracks 먼저(사용자 활성화), 그다음 토큰·접속.
 - 모니터링 타일 = staffState(sharing ∪ stuck) 기준, 영상은 monitor 방 구독(adaptiveStream). 막혔어요 먼저(누른 순), 나머지 이름순.
+- 한 브라우저 = 한 계정(쿠키 공유). 탭이 아는 사용자를 `X-Onsil-User` 헤더로 보내고 SessionUserCheckFilter가 다르면 409 → 새로 고침 안내. STOMP 재연결 시 CONNECTED user-name도 비교.
 - CSRF 끔, 세션 쿠키 SameSite=Strict (로컬 MVP).
 - 기준 시각(폴더 밖 점검용): 2026-10-28T20:46:31+09:00. 시작 전 이미 있던 것: ~/.m2(.lemminx-maven만), %TEMP%(c:\temp)\hsperfdata_User\2704(19:40).
 
@@ -49,5 +50,5 @@
 - GitHub: origin = https://github.com/g2jkj0274/on-sil.git (master). 단계마다 커밋 후 push 한다 (사용자 요청, 2026-10-28).
 
 ## 다음에 이어서 할 일 (2026-11-02)
-- 4단계 브라우저 확인 요청함: 공유 요청→학생 수락→모니터링 탭 타일, 학생 직접 공유/중지, 막혔어요 정렬·확인, 크게 보기.
+- 4단계 1차 확인: 한 브라우저에서 student1·2 로그인 → 쿠키 공유로 둘 다 student2 토큰을 받아 DUPLICATE_IDENTITY (위 필터로 막음). 다른 브라우저/프로필로 재확인 요청함: 공유 요청→학생 수락→모니터링 탭 타일, 학생 직접 공유/중지, 막혔어요 정렬·확인, 크게 보기.
 - 다음: 5단계 녹화.

@@ -29,6 +29,11 @@ const App = {
     };
     for (const b of document.querySelectorAll('#tabs button')) b.onclick = () => this.showTab(b.dataset.tab);
 
+    // 탭에 돌아왔을 때 다른 탭에서 계정이 바뀌었는지 바로 확인 (바뀌었으면 api 가 409 → 새로 고침 안내)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') api('GET', '/api/me').catch(() => {});
+    });
+
     Realtime.start();
     await this.loadClasses();
     const saved = Number(sessionStorage.getItem('onsil.class'));

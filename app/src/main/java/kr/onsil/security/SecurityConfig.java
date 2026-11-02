@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import java.io.IOException;
@@ -30,6 +31,7 @@ public class SecurityConfig {
                 .requestMatchers("/login.html", "/css/**", "/js/**", "/vendor/**", "/favicon.ico",
                         "/api/signup", "/api/login", "/error").permitAll()
                 .anyRequest().authenticated())
+            .addFilterAfter(new SessionUserCheckFilter(), AuthorizationFilter.class)
             .exceptionHandling(ex -> ex
                 // API 와 WebSocket 은 401, 화면은 로그인 페이지로
                 .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),

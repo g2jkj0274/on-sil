@@ -3,6 +3,8 @@
 
 async function api(method, url, body) {
   const opts = { method, headers: {} };
+  // 다른 탭에서 다른 계정으로 로그인했는지 서버가 확인할 수 있게 (SessionUserCheckFilter)
+  if (typeof App !== 'undefined' && App.me) opts.headers['X-Onsil-User'] = String(App.me.id);
   if (body instanceof FormData || body instanceof Blob) {
     opts.body = body;
   } else if (body !== undefined) {
@@ -13,8 +15,22 @@ async function api(method, url, body) {
   if (res.status === 401) { location.href = '/login.html'; throw new Error('로그인이 필요합니다.'); }
   const text = await res.text();
   const data = text ? (() => { try { return JSON.parse(text); } catch { return text; } })() : null;
+  if (res.status === 409 && data && data.code === 'SESSION_USER_CHANGED') sessionUserChanged();
   if (!res.ok) throw new Error((data && data.message) || `요청 실패 (${res.status})`);
   return data;
+}
+
+/** 같은 브라우저의 다른 탭에서 다른 계정으로 로그인됨 → 이 탭을 새 계정으로 다시 연다. */
+let sessionChangedShown = false;
+function sessionUserChanged() {
+  if (sessionChangedShown) return;
+  sessionChangedShown = true;
+  modal({
+    title: '다른 계정으로 로그인됨',
+    body: `<div>이 브라우저의 다른 탭에서 다른 계정으로 로그인했습니다. 한 브라우저에서는 한 계정만 쓸 수 있어 이 탭을 새로 고칩니다.</div>
+      <div class="dim">여러 계정을 동시에 쓰려면 다른 브라우저나 다른 브라우저 프로필을 사용하세요.</div>`,
+    buttons: [{ label: '새로 고침', value: true }],
+  }).then(() => location.reload());
 }
 
 function esc(s) {
